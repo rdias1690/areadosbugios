@@ -1,0 +1,1662 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+        <link rel="stylesheet" href="css/L.Control.Locate.min.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet-measure.css">
+        <style>
+        #map {
+            width: 1441px;
+            height: 852px;
+        }
+        </style>
+        <title>Área de Impacto sobre os bugios e zoneamento de Curitiba e São José dos Pinhais</title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/L.Control.Layers.Tree.min.js"></script>
+        <script src="js/L.Control.Locate.min.js"></script>
+        <script src="js/multi-style-layer.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-measure.js"></script>
+        <script src="data/ZoneamentodeCuritiba_1.js"></script>
+        <script src="data/ZoneamentodeSoJosdosPinhais_2.js"></script>
+        <script src="data/readeProteoAmbientaldoIguauDECRETON1025_3.js"></script>
+        <script src="data/OcupaoIrregulareAglomeradosSubnormais_4.js"></script>
+        <script src="data/PermetroUrbanodeSoJosdosPinhais_5.js"></script>
+        <script src="data/DivisaRegionalBairroNovo_6.js"></script>
+        <script src="data/RefgiodeVidaSilvestreFozdoRioMaurcioRioIguau_7.js"></script>
+        <script src="data/PermetrodaAPAdoRioIguau_8.js"></script>
+        <script src="data/CidadedeCuritiba_9.js"></script>
+        <script src="data/readeEstudo_10.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:false, maxZoom:28, minZoom:1
+        }).fitBounds([[-25.730060129991315,-49.5391644406819],[-25.30181450075278,-48.75217468734219]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        // remove popup's row if "visible-with-data"
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        // add class to format popup if it contains media
+		function addClassToPopupIfMedia(content, popup) {
+			var tempDiv = document.createElement('div');
+			tempDiv.innerHTML = content;
+			if (tempDiv.querySelector('td img')) {
+				popup._contentNode.classList.add('media');
+					// Delay to force the redraw
+					setTimeout(function() {
+						popup.update();
+					}, 10);
+			} else {
+				popup._contentNode.classList.remove('media');
+			}
+		}
+        var title = new L.Control({'position':'topright'});
+        title.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'info');
+            this.update();
+            return this._div;
+        };
+        title.update = function () {
+            this._div.innerHTML = '<h2>Área de Impacto sobre os bugios e zoneamento de Curitiba e São José dos Pinhais</h2>';
+        };
+        title.addTo(map);
+        var zoomControl = L.control.zoom({
+            position: 'topleft'
+        }).addTo(map);
+        L.control.locate({locateOptions: {maxZoom: 19}}).addTo(map);
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'meters',
+            secondaryLengthUnit: 'kilometers',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'hectares'
+        });
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0].innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0].className += ' fas fa-ruler';
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_GoogleHybrid_0');
+        map.getPane('pane_GoogleHybrid_0').style.zIndex = 400;
+        var layer_GoogleHybrid_0 = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+            pane: 'pane_GoogleHybrid_0',
+            opacity: 0.5,
+            attribution: '<a href="https://www.google.at/permissions/geoguidelines/attr-guide.html">Map data ©2015 Google</a>',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 20
+        });
+        layer_GoogleHybrid_0;
+        map.addLayer(layer_GoogleHybrid_0);
+        function pop_ZoneamentodeCuritiba_1(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TEMA'] !== null ? autolinker.link(feature.properties['TEMA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NM_GRUPO'] !== null ? autolinker.link(feature.properties['NM_GRUPO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CD_ZONA'] !== null ? autolinker.link(feature.properties['CD_ZONA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NM_ZONA'] !== null ? autolinker.link(feature.properties['NM_ZONA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SG_ZONA'] !== null ? autolinker.link(feature.properties['SG_ZONA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LEGISLACAO'] !== null ? autolinker.link(feature.properties['LEGISLACAO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['DATA_ATUAL'] !== null ? autolinker.link(feature.properties['DATA_ATUAL'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['DATA_VERSA'] !== null ? autolinker.link(feature.properties['DATA_VERSA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SHAPE_AREA'] !== null ? autolinker.link(feature.properties['SHAPE_AREA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SHAPE_LEN'] !== null ? autolinker.link(feature.properties['SHAPE_LEN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Regional'] !== null ? autolinker.link(feature.properties['Regional'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_ZoneamentodeCuritiba_1_0(feature) {
+            switch(String(feature.properties['NM_ZONA'])) {
+                case 'APA DO IGUAÇU':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(48,18,59,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'APA DO PASSAÚNA':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(54,34,97,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'EIXO CONECTOR LESTE 3':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(60,49,132,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'EIXO CONECTOR OESTE 1':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(64,64,162,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'EIXO CONECTOR OESTE 2':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(67,79,188,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'EIXO CONECTOR OESTE 3':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(69,93,210,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'EIXO CONECTOR OESTE 4':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(70,107,227,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'EIXO CONECTOR SUL 1':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(71,121,241,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'EIXO DE ADENSAMENTO COMENDADOR FRANCO':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(70,134,251,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'EIXO DE ADENSAMENTO ENGENHEIRO COSTA BARROS':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(66,148,255,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'EIXO ESTRUTURAL':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(59,161,253,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'EIXO MARECHAL FLORIANO':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(50,174,246,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'EIXO NOVA CURITIBA':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(40,188,235,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'EIXO PRES. AFFONSO CAMARGO':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(32,200,222,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'PARQUES E BOSQUES':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(26,211,209,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'POLO DA LINHA VERDE':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(24,221,194,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'SETOR ESPECIAL DA LINHA VERDE':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(27,229,181,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'SETOR ESPECIAL DE HABITAÇÃO DE INTERESSE SOCIAL':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(36,236,168,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA CENTRAL':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(50,242,152,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA CENTRO CÍVICO':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(68,247,134,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA COMERCIAL SANTA FELICIDADE':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(88,251,116,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA COMERCIAL UMBARÁ':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(109,254,98,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA DE SERVIÇOS 1':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(129,255,82,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA DE SERVIÇOS 2':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(149,254,69,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA DE SERVIÇOS 2 - LINHA VERDE':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(164,252,60,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA DE TRANSIÇÃO DA LINHA VERDE':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(178,249,54,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA DE USO MISTO 1':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(192,243,52,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA DE USO MISTO 2':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(205,236,52,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA DE USO MISTO 3':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(218,227,54,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA DE USO MISTO DO VALE DO PINHÃO':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(228,218,56,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA EDUCACIONAL':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(238,207,58,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA ESPECIAL DESPORTIVA - LINHA VERDE':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(245,196,58,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA HISTÓRICA 1':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(251,185,56,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA HISTÓRICA 2':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(253,172,52,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA INDUSTRIAL':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(254,157,46,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA INDUSTRIAL - LINHA VERDE':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(253,142,40,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA MILITAR':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(251,126,33,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA POLO DE SOFTWARE':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(247,110,26,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA RESIDENCIAL 1':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(241,94,19,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA RESIDENCIAL 2':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(235,80,14,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA RESIDENCIAL 3':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(227,68,10,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA RESIDENCIAL 3 - TRANSIÇÃO':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(219,58,7,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA RESIDENCIAL 4':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(208,47,5,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA RESIDENCIAL 4 - LINHA VERDE':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(196,38,3,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA RESIDENCIAL DE OCUPAÇÃO CONTROLADA':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(184,29,2,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA RESIDENCIAL DE OCUPAÇÃO INTEGRADA':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(169,22,1,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA SALDANHA MARINHO':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(154,15,1,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'ZONA SÃO FRANCISCO':
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(137,8,2,1.0)',
+                interactive: true,
+            }
+                    break;
+                default:
+                    return {
+                pane: 'pane_ZoneamentodeCuritiba_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(122,4,3,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_ZoneamentodeCuritiba_1');
+        map.getPane('pane_ZoneamentodeCuritiba_1').style.zIndex = 401;
+        map.getPane('pane_ZoneamentodeCuritiba_1').style['mix-blend-mode'] = 'normal';
+        var layer_ZoneamentodeCuritiba_1 = new L.geoJson(json_ZoneamentodeCuritiba_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_ZoneamentodeCuritiba_1',
+            layerName: 'layer_ZoneamentodeCuritiba_1',
+            pane: 'pane_ZoneamentodeCuritiba_1',
+            onEachFeature: pop_ZoneamentodeCuritiba_1,
+            style: style_ZoneamentodeCuritiba_1_0,
+        });
+        bounds_group.addLayer(layer_ZoneamentodeCuritiba_1);
+        map.addLayer(layer_ZoneamentodeCuritiba_1);
+        function pop_ZoneamentodeSoJosdosPinhais_2(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['objectid_1'] !== null ? autolinker.link(feature.properties['objectid_1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['area_ha'] !== null ? autolinker.link(feature.properties['area_ha'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['c_zoneam'] !== null ? autolinker.link(feature.properties['c_zoneam'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['nome_zona'] !== null ? autolinker.link(feature.properties['nome_zona'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['densidade'] !== null ? autolinker.link(feature.properties['densidade'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['created_us'] !== null ? autolinker.link(feature.properties['created_us'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['created_da'] !== null ? autolinker.link(feature.properties['created_da'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['last_edite'] !== null ? autolinker.link(feature.properties['last_edite'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['last_edi_1'] !== null ? autolinker.link(feature.properties['last_edi_1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['globalid'] !== null ? autolinker.link(feature.properties['globalid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_ZoneamentodeSoJosdosPinhais_2_0(feature) {
+            switch(String(feature.properties['nome_zona'])) {
+                case 'Zona Central 1':
+                    return {
+                pane: 'pane_ZoneamentodeSoJosdosPinhais_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(0,0,4,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Zona Central 2':
+                    return {
+                pane: 'pane_ZoneamentodeSoJosdosPinhais_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(8,6,29,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Zona da Colônia Murici':
+                    return {
+                pane: 'pane_ZoneamentodeSoJosdosPinhais_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(23,11,58,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Zona de Comércio e Serviço':
+                    return {
+                pane: 'pane_ZoneamentodeSoJosdosPinhais_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(44,11,87,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Zona de Expansão Urbana':
+                    return {
+                pane: 'pane_ZoneamentodeSoJosdosPinhais_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(66,10,104,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Zona de Indústria e de Serviços':
+                    return {
+                pane: 'pane_ZoneamentodeSoJosdosPinhais_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(87,15,110,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Zona de Indústria e de Serviços 2':
+                    return {
+                pane: 'pane_ZoneamentodeSoJosdosPinhais_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(107,23,110,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Zona de Ocupação Consolidada':
+                    return {
+                pane: 'pane_ZoneamentodeSoJosdosPinhais_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(127,31,108,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Zona Especial Academia Guatupê':
+                    return {
+                pane: 'pane_ZoneamentodeSoJosdosPinhais_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(147,38,103,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Zona Especial Aeroportuária':
+                    return {
+                pane: 'pane_ZoneamentodeSoJosdosPinhais_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(168,46,95,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Zona Especial de Ocupação Restrita 1':
+                    return {
+                pane: 'pane_ZoneamentodeSoJosdosPinhais_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(0,32,77,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Zona Especial de Ocupação Restrita 2':
+                    return {
+                pane: 'pane_ZoneamentodeSoJosdosPinhais_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(204,66,72,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Zona Especial de Serviços Intermodais':
+                    return {
+                pane: 'pane_ZoneamentodeSoJosdosPinhais_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(221,81,57,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Zona Especial do Centro Histórico':
+                    return {
+                pane: 'pane_ZoneamentodeSoJosdosPinhais_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(234,98,42,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Zona Especial Estrutural':
+                    return {
+                pane: 'pane_ZoneamentodeSoJosdosPinhais_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(243,119,26,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Zona Residencial 1':
+                    return {
+                pane: 'pane_ZoneamentodeSoJosdosPinhais_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(249,141,10,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Zona Residencial 2':
+                    return {
+                pane: 'pane_ZoneamentodeSoJosdosPinhais_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(252,164,11,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Zona Residencial 3':
+                    return {
+                pane: 'pane_ZoneamentodeSoJosdosPinhais_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(251,190,35,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Zona Residencial 4':
+                    return {
+                pane: 'pane_ZoneamentodeSoJosdosPinhais_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(246,214,68,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Zona Rural':
+                    return {
+                pane: 'pane_ZoneamentodeSoJosdosPinhais_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(242,238,114,1.0)',
+                interactive: true,
+            }
+                    break;
+                default:
+                    return {
+                pane: 'pane_ZoneamentodeSoJosdosPinhais_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(252,255,164,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_ZoneamentodeSoJosdosPinhais_2');
+        map.getPane('pane_ZoneamentodeSoJosdosPinhais_2').style.zIndex = 402;
+        map.getPane('pane_ZoneamentodeSoJosdosPinhais_2').style['mix-blend-mode'] = 'normal';
+        var layer_ZoneamentodeSoJosdosPinhais_2 = new L.geoJson(json_ZoneamentodeSoJosdosPinhais_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_ZoneamentodeSoJosdosPinhais_2',
+            layerName: 'layer_ZoneamentodeSoJosdosPinhais_2',
+            pane: 'pane_ZoneamentodeSoJosdosPinhais_2',
+            onEachFeature: pop_ZoneamentodeSoJosdosPinhais_2,
+            style: style_ZoneamentodeSoJosdosPinhais_2_0,
+        });
+        bounds_group.addLayer(layer_ZoneamentodeSoJosdosPinhais_2);
+        map.addLayer(layer_ZoneamentodeSoJosdosPinhais_2);
+        function pop_readeProteoAmbientaldoIguauDECRETON1025_3(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['OBJECTID'] !== null ? autolinker.link(feature.properties['OBJECTID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TEMA'] !== null ? autolinker.link(feature.properties['TEMA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NM_GRUPO'] !== null ? autolinker.link(feature.properties['NM_GRUPO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CD_SETOR'] !== null ? autolinker.link(feature.properties['CD_SETOR'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NM_SETOR'] !== null ? autolinker.link(feature.properties['NM_SETOR'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SG_SETOR'] !== null ? autolinker.link(feature.properties['SG_SETOR'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LEGISLACAO'] !== null ? autolinker.link(feature.properties['LEGISLACAO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['DATA_ATUAL'] !== null ? autolinker.link(feature.properties['DATA_ATUAL'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['DATA_VERSA'] !== null ? autolinker.link(feature.properties['DATA_VERSA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SHAPE_AREA'] !== null ? autolinker.link(feature.properties['SHAPE_AREA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SHAPE_LEN'] !== null ? autolinker.link(feature.properties['SHAPE_LEN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_readeProteoAmbientaldoIguauDECRETON1025_3_0(feature) {
+            switch(String(feature.properties['NM_SETOR'])) {
+                case 'SETOR DE ALTA RESTRIÇÃO DE USO':
+                    return {
+                pane: 'pane_readeProteoAmbientaldoIguauDECRETON1025_3',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(0,68,27,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'SETOR DE MÉDIA RESTRIÇÃO DE USO':
+                    return {
+                pane: 'pane_readeProteoAmbientaldoIguauDECRETON1025_3',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(7,115,49,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'SETOR DE SERVIÇOS':
+                    return {
+                pane: 'pane_readeProteoAmbientaldoIguauDECRETON1025_3',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(42,146,75,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'SETOR DE TRANSIÇÃO':
+                    return {
+                pane: 'pane_readeProteoAmbientaldoIguauDECRETON1025_3',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(75,176,98,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'SETOR DE TRANSIÇÃO - BAIRRO NOVO DO CAXIMBA':
+                    return {
+                pane: 'pane_readeProteoAmbientaldoIguauDECRETON1025_3',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(123,199,124,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'SETOR DE TRANSIÇÃO RESILIENTE':
+                    return {
+                pane: 'pane_readeProteoAmbientaldoIguauDECRETON1025_3',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(165,219,159,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'SETOR DE UNIDADES DE CONSERVAÇÃO':
+                    return {
+                pane: 'pane_readeProteoAmbientaldoIguauDECRETON1025_3',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(201,234,194,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'SETOR DE USO ESPORTIVO':
+                    return {
+                pane: 'pane_readeProteoAmbientaldoIguauDECRETON1025_3',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(230,245,225,1.0)',
+                interactive: true,
+            }
+                    break;
+                default:
+                    return {
+                pane: 'pane_readeProteoAmbientaldoIguauDECRETON1025_3',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(247,252,245,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_readeProteoAmbientaldoIguauDECRETON1025_3');
+        map.getPane('pane_readeProteoAmbientaldoIguauDECRETON1025_3').style.zIndex = 403;
+        map.getPane('pane_readeProteoAmbientaldoIguauDECRETON1025_3').style['mix-blend-mode'] = 'normal';
+        var layer_readeProteoAmbientaldoIguauDECRETON1025_3 = new L.geoJson(json_readeProteoAmbientaldoIguauDECRETON1025_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_readeProteoAmbientaldoIguauDECRETON1025_3',
+            layerName: 'layer_readeProteoAmbientaldoIguauDECRETON1025_3',
+            pane: 'pane_readeProteoAmbientaldoIguauDECRETON1025_3',
+            onEachFeature: pop_readeProteoAmbientaldoIguauDECRETON1025_3,
+            style: style_readeProteoAmbientaldoIguauDECRETON1025_3_0,
+        });
+        bounds_group.addLayer(layer_readeProteoAmbientaldoIguauDECRETON1025_3);
+        map.addLayer(layer_readeProteoAmbientaldoIguauDECRETON1025_3);
+        function pop_OcupaoIrregulareAglomeradosSubnormais_4(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CodAGSN'] !== null ? autolinker.link(feature.properties['CodAGSN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NM_AGSN'] !== null ? autolinker.link(feature.properties['NM_AGSN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CD_GEOCODM'] !== null ? autolinker.link(feature.properties['CD_GEOCODM'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NM_MUNICIP'] !== null ? autolinker.link(feature.properties['NM_MUNICIP'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['uf'] !== null ? autolinker.link(feature.properties['uf'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['OBJECTID'] !== null ? autolinker.link(feature.properties['OBJECTID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CODIGO'] !== null ? autolinker.link(feature.properties['CODIGO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['COD_IPPUC'] !== null ? autolinker.link(feature.properties['COD_IPPUC'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['COD_SISPEH'] !== null ? autolinker.link(feature.properties['COD_SISPEH'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NOME'] !== null ? autolinker.link(feature.properties['NOME'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NOME_COMPL'] !== null ? autolinker.link(feature.properties['NOME_COMPL'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CATEGORIA'] !== null ? autolinker.link(feature.properties['CATEGORIA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['BAIRRO'] !== null ? autolinker.link(feature.properties['BAIRRO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['REGIONAL'] !== null ? autolinker.link(feature.properties['REGIONAL'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['QUADRICULA'] !== null ? autolinker.link(feature.properties['QUADRICULA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['OBS'] !== null ? autolinker.link(feature.properties['OBS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['FONTE'] !== null ? autolinker.link(feature.properties['FONTE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CATEG_2000'] !== null ? autolinker.link(feature.properties['CATEG_2000'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CATEG_2005'] !== null ? autolinker.link(feature.properties['CATEG_2005'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CATEG_2010'] !== null ? autolinker.link(feature.properties['CATEG_2010'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CATEG_2012'] !== null ? autolinker.link(feature.properties['CATEG_2012'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CATEG_2014'] !== null ? autolinker.link(feature.properties['CATEG_2014'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['INFO_EDIT_'] !== null ? autolinker.link(feature.properties['INFO_EDIT_'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CATEG_2016'] !== null ? autolinker.link(feature.properties['CATEG_2016'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['INFO_EDIT1'] !== null ? autolinker.link(feature.properties['INFO_EDIT1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NOME_ANTER'] !== null ? autolinker.link(feature.properties['NOME_ANTER'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SHAPE_AREA'] !== null ? autolinker.link(feature.properties['SHAPE_AREA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SHAPE_LEN'] !== null ? autolinker.link(feature.properties['SHAPE_LEN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_OcupaoIrregulareAglomeradosSubnormais_4_0() {
+            return {
+                pane: 'pane_OcupaoIrregulareAglomeradosSubnormais_4',
+                interactive: true,
+            }
+        }
+        function style_OcupaoIrregulareAglomeradosSubnormais_4_1() {
+            return {
+                pane: 'pane_OcupaoIrregulareAglomeradosSubnormais_4',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_OcupaoIrregulareAglomeradosSubnormais_4');
+        map.getPane('pane_OcupaoIrregulareAglomeradosSubnormais_4').style.zIndex = 404;
+        map.getPane('pane_OcupaoIrregulareAglomeradosSubnormais_4').style['mix-blend-mode'] = 'normal';
+        var layer_OcupaoIrregulareAglomeradosSubnormais_4 = new L.geoJson.multiStyle(json_OcupaoIrregulareAglomeradosSubnormais_4, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_OcupaoIrregulareAglomeradosSubnormais_4',
+            layerName: 'layer_OcupaoIrregulareAglomeradosSubnormais_4',
+            pane: 'pane_OcupaoIrregulareAglomeradosSubnormais_4',
+            onEachFeature: pop_OcupaoIrregulareAglomeradosSubnormais_4,
+            styles: [style_OcupaoIrregulareAglomeradosSubnormais_4_0,style_OcupaoIrregulareAglomeradosSubnormais_4_1,]
+        });
+        bounds_group.addLayer(layer_OcupaoIrregulareAglomeradosSubnormais_4);
+        map.addLayer(layer_OcupaoIrregulareAglomeradosSubnormais_4);
+        function pop_PermetroUrbanodeSoJosdosPinhais_5(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['objectid_1'] !== null ? autolinker.link(feature.properties['objectid_1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['area_ha'] !== null ? autolinker.link(feature.properties['area_ha'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['c_zoneam'] !== null ? autolinker.link(feature.properties['c_zoneam'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['nome_zona'] !== null ? autolinker.link(feature.properties['nome_zona'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['densidade'] !== null ? autolinker.link(feature.properties['densidade'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['created_us'] !== null ? autolinker.link(feature.properties['created_us'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['created_da'] !== null ? autolinker.link(feature.properties['created_da'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['last_edite'] !== null ? autolinker.link(feature.properties['last_edite'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['last_edi_1'] !== null ? autolinker.link(feature.properties['last_edi_1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['globalid'] !== null ? autolinker.link(feature.properties['globalid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_PermetroUrbanodeSoJosdosPinhais_5_0() {
+            return {
+                pane: 'pane_PermetroUrbanodeSoJosdosPinhais_5',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_PermetroUrbanodeSoJosdosPinhais_5');
+        map.getPane('pane_PermetroUrbanodeSoJosdosPinhais_5').style.zIndex = 405;
+        map.getPane('pane_PermetroUrbanodeSoJosdosPinhais_5').style['mix-blend-mode'] = 'normal';
+        var layer_PermetroUrbanodeSoJosdosPinhais_5 = new L.geoJson(json_PermetroUrbanodeSoJosdosPinhais_5, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_PermetroUrbanodeSoJosdosPinhais_5',
+            layerName: 'layer_PermetroUrbanodeSoJosdosPinhais_5',
+            pane: 'pane_PermetroUrbanodeSoJosdosPinhais_5',
+            onEachFeature: pop_PermetroUrbanodeSoJosdosPinhais_5,
+            style: style_PermetroUrbanodeSoJosdosPinhais_5_0,
+        });
+        bounds_group.addLayer(layer_PermetroUrbanodeSoJosdosPinhais_5);
+        map.addLayer(layer_PermetroUrbanodeSoJosdosPinhais_5);
+        function pop_DivisaRegionalBairroNovo_6(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['OBJECTID'] !== null ? autolinker.link(feature.properties['OBJECTID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CODIGO'] !== null ? autolinker.link(feature.properties['CODIGO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TIPO'] !== null ? autolinker.link(feature.properties['TIPO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NOME'] !== null ? autolinker.link(feature.properties['NOME'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NOME_LEG'] !== null ? autolinker.link(feature.properties['NOME_LEG'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['COD_LEG'] !== null ? autolinker.link(feature.properties['COD_LEG'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['FONTE'] !== null ? autolinker.link(feature.properties['FONTE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SHAPE_AREA'] !== null ? autolinker.link(feature.properties['SHAPE_AREA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SHAPE_LEN'] !== null ? autolinker.link(feature.properties['SHAPE_LEN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_DivisaRegionalBairroNovo_6_0() {
+            return {
+                pane: 'pane_DivisaRegionalBairroNovo_6',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_DivisaRegionalBairroNovo_6');
+        map.getPane('pane_DivisaRegionalBairroNovo_6').style.zIndex = 406;
+        map.getPane('pane_DivisaRegionalBairroNovo_6').style['mix-blend-mode'] = 'normal';
+        var layer_DivisaRegionalBairroNovo_6 = new L.geoJson(json_DivisaRegionalBairroNovo_6, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_DivisaRegionalBairroNovo_6',
+            layerName: 'layer_DivisaRegionalBairroNovo_6',
+            pane: 'pane_DivisaRegionalBairroNovo_6',
+            onEachFeature: pop_DivisaRegionalBairroNovo_6,
+            style: style_DivisaRegionalBairroNovo_6_0,
+        });
+        bounds_group.addLayer(layer_DivisaRegionalBairroNovo_6);
+        map.addLayer(layer_DivisaRegionalBairroNovo_6);
+        function pop_RefgiodeVidaSilvestreFozdoRioMaurcioRioIguau_7(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['OBJECTID'] !== null ? autolinker.link(feature.properties['OBJECTID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID'] !== null ? autolinker.link(feature.properties['ID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TIPO'] !== null ? autolinker.link(feature.properties['TIPO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SIGLA'] !== null ? autolinker.link(feature.properties['SIGLA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NOME'] !== null ? autolinker.link(feature.properties['NOME'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['MUNICIPIO'] !== null ? autolinker.link(feature.properties['MUNICIPIO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LEGISLACAO'] !== null ? autolinker.link(feature.properties['LEGISLACAO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AREA_HA'] !== null ? autolinker.link(feature.properties['AREA_HA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SHAPE_AREA'] !== null ? autolinker.link(feature.properties['SHAPE_AREA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SHAPE_LEN'] !== null ? autolinker.link(feature.properties['SHAPE_LEN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_RefgiodeVidaSilvestreFozdoRioMaurcioRioIguau_7_0() {
+            return {
+                pane: 'pane_RefgiodeVidaSilvestreFozdoRioMaurcioRioIguau_7',
+                opacity: 1,
+                color: 'rgba(150,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(150,0,0,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_RefgiodeVidaSilvestreFozdoRioMaurcioRioIguau_7');
+        map.getPane('pane_RefgiodeVidaSilvestreFozdoRioMaurcioRioIguau_7').style.zIndex = 407;
+        map.getPane('pane_RefgiodeVidaSilvestreFozdoRioMaurcioRioIguau_7').style['mix-blend-mode'] = 'normal';
+        var layer_RefgiodeVidaSilvestreFozdoRioMaurcioRioIguau_7 = new L.geoJson(json_RefgiodeVidaSilvestreFozdoRioMaurcioRioIguau_7, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_RefgiodeVidaSilvestreFozdoRioMaurcioRioIguau_7',
+            layerName: 'layer_RefgiodeVidaSilvestreFozdoRioMaurcioRioIguau_7',
+            pane: 'pane_RefgiodeVidaSilvestreFozdoRioMaurcioRioIguau_7',
+            onEachFeature: pop_RefgiodeVidaSilvestreFozdoRioMaurcioRioIguau_7,
+            style: style_RefgiodeVidaSilvestreFozdoRioMaurcioRioIguau_7_0,
+        });
+        bounds_group.addLayer(layer_RefgiodeVidaSilvestreFozdoRioMaurcioRioIguau_7);
+        map.addLayer(layer_RefgiodeVidaSilvestreFozdoRioMaurcioRioIguau_7);
+        function pop_PermetrodaAPAdoRioIguau_8(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TEMA'] !== null ? autolinker.link(feature.properties['TEMA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NM_GRUPO'] !== null ? autolinker.link(feature.properties['NM_GRUPO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LEGISLACAO'] !== null ? autolinker.link(feature.properties['LEGISLACAO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['DATA_ATUAL'] !== null ? autolinker.link(feature.properties['DATA_ATUAL'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['DATA_VERSA'] !== null ? autolinker.link(feature.properties['DATA_VERSA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AREA'] !== null ? autolinker.link(feature.properties['AREA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LEN'] !== null ? autolinker.link(feature.properties['LEN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        var pattern_PermetrodaAPAdoRioIguau_8_0 = new L.StripePattern({
+            weight: 0.2,
+            spaceWeight: 1.0,
+            color: '#000000',
+            opacity: 1.0,
+            spaceOpacity: 0,
+            angle: 315
+        });
+        pattern_PermetrodaAPAdoRioIguau_8_0.addTo(map);
+        function style_PermetrodaAPAdoRioIguau_8_0() {
+            return {
+                pane: 'pane_PermetrodaAPAdoRioIguau_8',
+                stroke: false,
+                fillOpacity: 1,
+                fillPattern: pattern_PermetrodaAPAdoRioIguau_8_0,
+                interactive: true,
+            }
+        }
+        function style_PermetrodaAPAdoRioIguau_8_1() {
+            return {
+                pane: 'pane_PermetrodaAPAdoRioIguau_8',
+                stroke: false,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_PermetrodaAPAdoRioIguau_8');
+        map.getPane('pane_PermetrodaAPAdoRioIguau_8').style.zIndex = 408;
+        map.getPane('pane_PermetrodaAPAdoRioIguau_8').style['mix-blend-mode'] = 'normal';
+        var layer_PermetrodaAPAdoRioIguau_8 = new L.geoJson.multiStyle(json_PermetrodaAPAdoRioIguau_8, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_PermetrodaAPAdoRioIguau_8',
+            layerName: 'layer_PermetrodaAPAdoRioIguau_8',
+            pane: 'pane_PermetrodaAPAdoRioIguau_8',
+            onEachFeature: pop_PermetrodaAPAdoRioIguau_8,
+            styles: [style_PermetrodaAPAdoRioIguau_8_0,style_PermetrodaAPAdoRioIguau_8_1,]
+        });
+        bounds_group.addLayer(layer_PermetrodaAPAdoRioIguau_8);
+        map.addLayer(layer_PermetrodaAPAdoRioIguau_8);
+        function pop_CidadedeCuritiba_9(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['OBJECTID'] !== null ? autolinker.link(feature.properties['OBJECTID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CODIGO'] !== null ? autolinker.link(feature.properties['CODIGO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TIPO'] !== null ? autolinker.link(feature.properties['TIPO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NOME'] !== null ? autolinker.link(feature.properties['NOME'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['FONTE'] !== null ? autolinker.link(feature.properties['FONTE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CD_REGIONA'] !== null ? autolinker.link(feature.properties['CD_REGIONA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NM_REGIONA'] !== null ? autolinker.link(feature.properties['NM_REGIONA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SHAPE_AREA'] !== null ? autolinker.link(feature.properties['SHAPE_AREA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SHAPE_LEN'] !== null ? autolinker.link(feature.properties['SHAPE_LEN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_CidadedeCuritiba_9_0() {
+            return {
+                pane: 'pane_CidadedeCuritiba_9',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_CidadedeCuritiba_9');
+        map.getPane('pane_CidadedeCuritiba_9').style.zIndex = 409;
+        map.getPane('pane_CidadedeCuritiba_9').style['mix-blend-mode'] = 'normal';
+        var layer_CidadedeCuritiba_9 = new L.geoJson(json_CidadedeCuritiba_9, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_CidadedeCuritiba_9',
+            layerName: 'layer_CidadedeCuritiba_9',
+            pane: 'pane_CidadedeCuritiba_9',
+            onEachFeature: pop_CidadedeCuritiba_9,
+            style: style_CidadedeCuritiba_9_0,
+        });
+        bounds_group.addLayer(layer_CidadedeCuritiba_9);
+        map.addLayer(layer_CidadedeCuritiba_9);
+        function pop_readeEstudo_10(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Name'] !== null ? autolinker.link(feature.properties['Name'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['descriptio'] !== null ? autolinker.link(feature.properties['descriptio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['timestamp'] !== null ? autolinker.link(feature.properties['timestamp'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['begin'] !== null ? autolinker.link(feature.properties['begin'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['end'] !== null ? autolinker.link(feature.properties['end'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['altitudeMo'] !== null ? autolinker.link(feature.properties['altitudeMo'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['tessellate'] !== null ? autolinker.link(feature.properties['tessellate'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['extrude'] !== null ? autolinker.link(feature.properties['extrude'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['visibility'] !== null ? autolinker.link(feature.properties['visibility'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['drawOrder'] !== null ? autolinker.link(feature.properties['drawOrder'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['icon'] !== null ? autolinker.link(feature.properties['icon'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_readeEstudo_10_0() {
+            return {
+                pane: 'pane_readeEstudo_10',
+                opacity: 1,
+                color: 'rgba(255,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_readeEstudo_10');
+        map.getPane('pane_readeEstudo_10').style.zIndex = 410;
+        map.getPane('pane_readeEstudo_10').style['mix-blend-mode'] = 'normal';
+        var layer_readeEstudo_10 = new L.geoJson(json_readeEstudo_10, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_readeEstudo_10',
+            layerName: 'layer_readeEstudo_10',
+            pane: 'pane_readeEstudo_10',
+            onEachFeature: pop_readeEstudo_10,
+            style: style_readeEstudo_10_0,
+        });
+        bounds_group.addLayer(layer_readeEstudo_10);
+        map.addLayer(layer_readeEstudo_10);
+        var baseMaps = {};
+        var overlaysTree = [
+            {label: '<img src="legend/readeEstudo_10.png" /> Área de Estudo', layer: layer_readeEstudo_10},
+            {label: '<img src="legend/CidadedeCuritiba_9.png" /> Cidade de Curitiba', layer: layer_CidadedeCuritiba_9},
+            {label: '<img src="legend/PermetrodaAPAdoRioIguau_8.png" /> Perímetro da APA do Rio Iguaçu', layer: layer_PermetrodaAPAdoRioIguau_8},
+            {label: '<img src="legend/RefgiodeVidaSilvestreFozdoRioMaurcioRioIguau_7.png" /> Refúgio de Vida Silvestre “Foz do Rio Maurício-Rio Iguaçu”', layer: layer_RefgiodeVidaSilvestreFozdoRioMaurcioRioIguau_7},
+            {label: '<img src="legend/DivisaRegionalBairroNovo_6.png" /> Divisa Regional Bairro Novo', layer: layer_DivisaRegionalBairroNovo_6},
+            {label: '<img src="legend/PermetroUrbanodeSoJosdosPinhais_5.png" /> Perímetro Urbano de São José dos Pinhais', layer: layer_PermetroUrbanodeSoJosdosPinhais_5},
+            {label: '<img src="legend/OcupaoIrregulareAglomeradosSubnormais_4.png" /> Ocupação Irregular e Aglomerados Subnormais', layer: layer_OcupaoIrregulareAglomeradosSubnormais_4},
+            {label: 'Área de Proteção Ambiental do Iguaçu (DECRETO Nº 1.025)<br /><table><tr><td style="text-align: center;"><img src="legend/readeProteoAmbientaldoIguauDECRETON1025_3_SETORDEALTARESTRIÇÃODEUSO0.png" /></td><td>SETOR DE ALTA RESTRIÇÃO DE USO</td></tr><tr><td style="text-align: center;"><img src="legend/readeProteoAmbientaldoIguauDECRETON1025_3_SETORDEMÉDIARESTRIÇÃODEUSO1.png" /></td><td>SETOR DE MÉDIA RESTRIÇÃO DE USO</td></tr><tr><td style="text-align: center;"><img src="legend/readeProteoAmbientaldoIguauDECRETON1025_3_SETORDESERVIÇOS2.png" /></td><td>SETOR DE SERVIÇOS</td></tr><tr><td style="text-align: center;"><img src="legend/readeProteoAmbientaldoIguauDECRETON1025_3_SETORDETRANSIÇÃO3.png" /></td><td>SETOR DE TRANSIÇÃO</td></tr><tr><td style="text-align: center;"><img src="legend/readeProteoAmbientaldoIguauDECRETON1025_3_SETORDETRANSIÇÃOBAIRRONOVODOCAXIMBA4.png" /></td><td>SETOR DE TRANSIÇÃO - BAIRRO NOVO DO CAXIMBA</td></tr><tr><td style="text-align: center;"><img src="legend/readeProteoAmbientaldoIguauDECRETON1025_3_SETORDETRANSIÇÃORESILIENTE5.png" /></td><td>SETOR DE TRANSIÇÃO RESILIENTE</td></tr><tr><td style="text-align: center;"><img src="legend/readeProteoAmbientaldoIguauDECRETON1025_3_SETORDEUNIDADESDECONSERVAÇÃO6.png" /></td><td>SETOR DE UNIDADES DE CONSERVAÇÃO</td></tr><tr><td style="text-align: center;"><img src="legend/readeProteoAmbientaldoIguauDECRETON1025_3_SETORDEUSOESPORTIVO7.png" /></td><td>SETOR DE USO ESPORTIVO</td></tr><tr><td style="text-align: center;"><img src="legend/readeProteoAmbientaldoIguauDECRETON1025_3_8.png" /></td><td></td></tr></table>', layer: layer_readeProteoAmbientaldoIguauDECRETON1025_3},
+            {label: 'Zoneamento de São José dos Pinhais<br /><table><tr><td style="text-align: center;"><img src="legend/ZoneamentodeSoJosdosPinhais_2_ZonaCentral10.png" /></td><td>Zona Central 1</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeSoJosdosPinhais_2_ZonaCentral21.png" /></td><td>Zona Central 2</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeSoJosdosPinhais_2_ZonadaColôniaMurici2.png" /></td><td>Zona da Colônia Murici</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeSoJosdosPinhais_2_ZonadeComércioeServiço3.png" /></td><td>Zona de Comércio e Serviço</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeSoJosdosPinhais_2_ZonadeExpansãoUrbana4.png" /></td><td>Zona de Expansão Urbana</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeSoJosdosPinhais_2_ZonadeIndústriaedeServiços5.png" /></td><td>Zona de Indústria e de Serviços</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeSoJosdosPinhais_2_ZonadeIndústriaedeServiços26.png" /></td><td>Zona de Indústria e de Serviços 2</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeSoJosdosPinhais_2_ZonadeOcupaçãoConsolidada7.png" /></td><td>Zona de Ocupação Consolidada</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeSoJosdosPinhais_2_ZonaEspecialAcademiaGuatupê8.png" /></td><td>Zona Especial Academia Guatupê</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeSoJosdosPinhais_2_ZonaEspecialAeroportuária9.png" /></td><td>Zona Especial Aeroportuária</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeSoJosdosPinhais_2_ZonaEspecialdeOcupaçãoRestrita110.png" /></td><td>Zona Especial de Ocupação Restrita 1</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeSoJosdosPinhais_2_ZonaEspecialdeOcupaçãoRestrita211.png" /></td><td>Zona Especial de Ocupação Restrita 2</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeSoJosdosPinhais_2_ZonaEspecialdeServiçosIntermodais12.png" /></td><td>Zona Especial de Serviços Intermodais</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeSoJosdosPinhais_2_ZonaEspecialdoCentroHistórico13.png" /></td><td>Zona Especial do Centro Histórico</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeSoJosdosPinhais_2_ZonaEspecialEstrutural14.png" /></td><td>Zona Especial Estrutural</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeSoJosdosPinhais_2_ZonaResidencial115.png" /></td><td>Zona Residencial 1</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeSoJosdosPinhais_2_ZonaResidencial216.png" /></td><td>Zona Residencial 2</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeSoJosdosPinhais_2_ZonaResidencial317.png" /></td><td>Zona Residencial 3</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeSoJosdosPinhais_2_ZonaResidencial418.png" /></td><td>Zona Residencial 4</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeSoJosdosPinhais_2_ZonaRural19.png" /></td><td>Zona Rural</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeSoJosdosPinhais_2_20.png" /></td><td></td></tr></table>', layer: layer_ZoneamentodeSoJosdosPinhais_2},
+            {label: 'Zoneamento de Curitiba<br /><table><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_APADOIGUAÇU0.png" /></td><td>APA DO IGUAÇU</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_APADOPASSAÚNA1.png" /></td><td>APA DO PASSAÚNA</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_EIXOCONECTORLESTE32.png" /></td><td>EIXO CONECTOR LESTE 3</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_EIXOCONECTOROESTE13.png" /></td><td>EIXO CONECTOR OESTE 1</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_EIXOCONECTOROESTE24.png" /></td><td>EIXO CONECTOR OESTE 2</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_EIXOCONECTOROESTE35.png" /></td><td>EIXO CONECTOR OESTE 3</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_EIXOCONECTOROESTE46.png" /></td><td>EIXO CONECTOR OESTE 4</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_EIXOCONECTORSUL17.png" /></td><td>EIXO CONECTOR SUL 1</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_EIXODEADENSAMENTOCOMENDADORFRANCO8.png" /></td><td>EIXO DE ADENSAMENTO COMENDADOR FRANCO</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_EIXODEADENSAMENTOENGENHEIROCOSTABARROS9.png" /></td><td>EIXO DE ADENSAMENTO ENGENHEIRO COSTA BARROS</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_EIXOESTRUTURAL10.png" /></td><td>EIXO ESTRUTURAL</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_EIXOMARECHALFLORIANO11.png" /></td><td>EIXO MARECHAL FLORIANO</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_EIXONOVACURITIBA12.png" /></td><td>EIXO NOVA CURITIBA</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_EIXOPRESAFFONSOCAMARGO13.png" /></td><td>EIXO PRES. AFFONSO CAMARGO</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_PARQUESEBOSQUES14.png" /></td><td>PARQUES E BOSQUES</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_POLODALINHAVERDE15.png" /></td><td>POLO DA LINHA VERDE</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_SETORESPECIALDALINHAVERDE16.png" /></td><td>SETOR ESPECIAL DA LINHA VERDE</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_SETORESPECIALDEHABITAÇÃODEINTERESSESOCIAL17.png" /></td><td>SETOR ESPECIAL DE HABITAÇÃO DE INTERESSE SOCIAL</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONACENTRAL18.png" /></td><td>ZONA CENTRAL</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONACENTROCÍVICO19.png" /></td><td>ZONA CENTRO CÍVICO</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONACOMERCIALSANTAFELICIDADE20.png" /></td><td>ZONA COMERCIAL SANTA FELICIDADE</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONACOMERCIALUMBARÁ21.png" /></td><td>ZONA COMERCIAL UMBARÁ</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONADESERVIÇOS122.png" /></td><td>ZONA DE SERVIÇOS 1</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONADESERVIÇOS223.png" /></td><td>ZONA DE SERVIÇOS 2</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONADESERVIÇOS2LINHAVERDE24.png" /></td><td>ZONA DE SERVIÇOS 2 - LINHA VERDE</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONADETRANSIÇÃODALINHAVERDE25.png" /></td><td>ZONA DE TRANSIÇÃO DA LINHA VERDE</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONADEUSOMISTO126.png" /></td><td>ZONA DE USO MISTO 1</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONADEUSOMISTO227.png" /></td><td>ZONA DE USO MISTO 2</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONADEUSOMISTO328.png" /></td><td>ZONA DE USO MISTO 3</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONADEUSOMISTODOVALEDOPINHÃO29.png" /></td><td>ZONA DE USO MISTO DO VALE DO PINHÃO</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONAEDUCACIONAL30.png" /></td><td>ZONA EDUCACIONAL</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONAESPECIALDESPORTIVALINHAVERDE31.png" /></td><td>ZONA ESPECIAL DESPORTIVA - LINHA VERDE</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONAHISTÓRICA132.png" /></td><td>ZONA HISTÓRICA 1</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONAHISTÓRICA233.png" /></td><td>ZONA HISTÓRICA 2</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONAINDUSTRIAL34.png" /></td><td>ZONA INDUSTRIAL</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONAINDUSTRIALLINHAVERDE35.png" /></td><td>ZONA INDUSTRIAL - LINHA VERDE</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONAMILITAR36.png" /></td><td>ZONA MILITAR</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONAPOLODESOFTWARE37.png" /></td><td>ZONA POLO DE SOFTWARE</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONARESIDENCIAL138.png" /></td><td>ZONA RESIDENCIAL 1</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONARESIDENCIAL239.png" /></td><td>ZONA RESIDENCIAL 2</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONARESIDENCIAL340.png" /></td><td>ZONA RESIDENCIAL 3</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONARESIDENCIAL3TRANSIÇÃO41.png" /></td><td>ZONA RESIDENCIAL 3 - TRANSIÇÃO</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONARESIDENCIAL442.png" /></td><td>ZONA RESIDENCIAL 4</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONARESIDENCIAL4LINHAVERDE43.png" /></td><td>ZONA RESIDENCIAL 4 - LINHA VERDE</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONARESIDENCIALDEOCUPAÇÃOCONTROLADA44.png" /></td><td>ZONA RESIDENCIAL DE OCUPAÇÃO CONTROLADA</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONARESIDENCIALDEOCUPAÇÃOINTEGRADA45.png" /></td><td>ZONA RESIDENCIAL DE OCUPAÇÃO INTEGRADA</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONASALDANHAMARINHO46.png" /></td><td>ZONA SALDANHA MARINHO</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_ZONASÃOFRANCISCO47.png" /></td><td>ZONA SÃO FRANCISCO</td></tr><tr><td style="text-align: center;"><img src="legend/ZoneamentodeCuritiba_1_48.png" /></td><td></td></tr></table>', layer: layer_ZoneamentodeCuritiba_1},
+            {label: "Google Hybrid", layer: layer_GoogleHybrid_0},]
+        var lay = L.control.layers.tree(null, overlaysTree,{
+            //namedToggle: true,
+            //selectorBack: false,
+            //closedSymbol: '&#8862; &#x1f5c0;',
+            //openedSymbol: '&#8863; &#x1f5c1;',
+            //collapseAll: 'Collapse all',
+            //expandAll: 'Expand all',
+            collapsed: false, 
+        });
+        lay.addTo(map);
+        setBounds();
+        resetLabels([layer_ZoneamentodeCuritiba_1,layer_ZoneamentodeSoJosdosPinhais_2,layer_readeProteoAmbientaldoIguauDECRETON1025_3]);
+        map.on("zoomend", function(){
+            resetLabels([layer_ZoneamentodeCuritiba_1,layer_ZoneamentodeSoJosdosPinhais_2,layer_readeProteoAmbientaldoIguauDECRETON1025_3]);
+        });
+        map.on("layeradd", function(){
+            resetLabels([layer_ZoneamentodeCuritiba_1,layer_ZoneamentodeSoJosdosPinhais_2,layer_readeProteoAmbientaldoIguauDECRETON1025_3]);
+        });
+        map.on("layerremove", function(){
+            resetLabels([layer_ZoneamentodeCuritiba_1,layer_ZoneamentodeSoJosdosPinhais_2,layer_readeProteoAmbientaldoIguauDECRETON1025_3]);
+        });
+        </script>
+    </body>
+</html>
